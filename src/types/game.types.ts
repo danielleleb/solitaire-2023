@@ -26,4 +26,5 @@ export interface IGameContext {
     setGame: (game: IGame) => void;
     flipDrawDeckCard: () => void;
     selectCard: (card: ICard) => void;
+    handleDropCardOnEmptyPile: (pile: string) => void;
 }

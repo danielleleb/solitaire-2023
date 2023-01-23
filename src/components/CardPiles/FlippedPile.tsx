@@ -15,7 +15,7 @@ export const FlippedPile = () => {
             </div> */}
             {
                 !game.flippedPile.length ? (
-                    <EmptyPile />
+                    <EmptyPile pileId='flippedPile' />
                 ) : (
                     <Card
                         card={game.flippedPile[0]}

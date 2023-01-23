@@ -3,7 +3,13 @@ import { ICard } from '../../types';
 import { useGameContext } from '../../contexts';
 import cs from 'classnames';
 
-export const Card = ({ card }: { flipped?: boolean, card?: ICard }) => {
+interface ICardProps extends React.HTMLProps<HTMLDivElement> {
+    flipped?: boolean;
+    card?: ICard;
+
+}
+
+export const Card = ({ card, className, style }: ICardProps) => {
     const { selectCard } = useGameContext();
     const suitIcon = () => {
         switch (card?.suit) {
@@ -54,18 +60,20 @@ export const Card = ({ card }: { flipped?: boolean, card?: ICard }) => {
     }
     return (
         <>
+        {/* <div className={cs('w-24 h-32 border rounded', className)}> */}
         {!card?.isFaceUp ? (
-            // <div className='bg-yellow-300 w-24 h-32 border rounded'></div>
-            <div className={cs('bg-yellow-300 w-24 h-32 border rounded')}></div>
+            <div style={style} className={cs(' bg-yellow-300 w-24 h-32 border border-black rounded min-w-min', className)}></div>
             ) : (
-            <div onClick={() => selectCard(card)} className={cs('w-24 h-32 border rounded', {
-                'border-emerald-300': card.isSelected
+            <div style={style} onClick={() => selectCard(card)} className={cs(' bg-white min-w-min w-24 h-32 border rounded', className, {
+                'border-emerald-300': card.isSelected,
+                'border-black': !card.isSelected
             })}>
                 {suitIcon()}
                 {cardValue()}
             </div>
         )
         }
+        {/* </div> */}
         </>
     )
 }

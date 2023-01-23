@@ -13,13 +13,17 @@ export const useGame = (): IGameContext => {
         }
     }
 
-    const handleDropCardOnEmptyPile = (card: ICard, pile: string) => {
+    const handleDropCardOnEmptyPile = (pile: string) => {
+        console.log(pile, 'DROP IT')
         // check if pile is empty
         // remove card from current pile
         // add that card to the pile
         // set the card's location to the pile
         // set the card as unselected
 
+        const card = game.selectedCard;
+
+        if (!card) return;
         // @ts-ignore-next-line 
         const pileToRemoveFrom = game[card.location.pile];
 
@@ -30,13 +34,21 @@ export const useGame = (): IGameContext => {
         game[pile].unshift(card);
 
         card.location = {
-            pile: ,
+            pile,
+            index: 0,
         }
+
+        card.isSelected = false;
+
+        setGame({
+            ...game
+        });
     }
 
     useEffect(() => {
         // find the prev selected card and unselect it 
-    }, [game.selectedCard])
+        console.log(game, 'game update')
+    }, [game])
 
     const selectCard = (card: ICard) => {
         if (game.selectedCard) {
@@ -73,7 +85,8 @@ export const useGame = (): IGameContext => {
         setGame,
         game,
         flipDrawDeckCard,
-        selectCard
+        selectCard,
+        handleDropCardOnEmptyPile
     }
 
 };
