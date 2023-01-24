@@ -17,7 +17,6 @@ export const MainPile = ({ pileId }: IMainPile) => {
             {
                 pile.length ? (
                     pile.map((card: ICard, index: number) => {
-                        // const zIndex = `z-[${pile.length - index}]`;
                         let zIndex = 'z-[20]';
                         let topDistance = 'top-[200px]';
                         const arrayLength = pile.length;

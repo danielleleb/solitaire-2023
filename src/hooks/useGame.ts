@@ -13,22 +13,61 @@ export const useGame = (): IGameContext => {
         }
     }
 
-    const handleDropCardOnEmptyPile = (pile: string) => {
-        console.log(pile, 'DROP IT')
-        // check if pile is empty
-        // remove card from current pile
-        // add that card to the pile
-        // set the card's location to the pile
-        // set the card as unselected
+    const dropCardOnAnotherCard = (pile: string) => {
 
+    }
+
+
+
+    const handleCardClick = (card: ICard) => {
+        // @ts-ignore-next-line 
+        if (!card.isFaceUp && !card.location.pile.includes('draw')) {
+            console.log('MADE IT IN')
+            // @ts-ignore-next-line 
+            const flippedCard = game[card.location.pile].shift();
+            // @ts-ignore-next-line 
+            game[card.location.pile].unshift(flipCard(flippedCard));
+            setGame({
+                ...game,
+            })
+        } else if (game.selectedCard) {
+            // check if selectedcard can be dropped on this card
+            if (card.value === game.selectedCard.value + 1) {
+                // @ts-ignore-next-line 
+                handleCardDrop(`${card.location.pile}`);
+            } else {
+                unselectCard();
+            }
+        } else {
+            selectCard(card);
+        }
+
+
+    }
+
+    const unselectCard = () => {
         const card = game.selectedCard;
+        if (!card) return;
+        card.isSelected = false;
+        game.selectedCard = null;
+        setGame({
+            ...game,
+        })
+    }
+
+    const handleCardDrop = (pile: string) => {
+        const card = game.selectedCard;
+        console.log(card, 'card')
 
         if (!card) return;
         // @ts-ignore-next-line 
         const pileToRemoveFrom = game[card.location.pile];
+        console.log(pileToRemoveFrom, 'pileToRemoveFrom')
+
 
         // @ts-ignore-next-line 
-        pileToRemoveFrom.splice(card.location.index, 1);
+        pileToRemoveFrom.splice(pileToRemoveFrom.indexOf(card), 1);
+        // pileToRemoveFrom.splice(card.location.index, 1);
 
         // @ts-ignore-next-line 
         game[pile].unshift(card);
@@ -37,12 +76,47 @@ export const useGame = (): IGameContext => {
             pile,
             index: 0,
         }
+        
 
         card.isSelected = false;
+
+        game.selectedCard = null;
 
         setGame({
             ...game
         });
+    }
+
+
+    const handleDropCardOnEmptyPile = (pile: string) => {
+        const card = game.selectedCard;
+        if (pile.includes('top') && card?.value !== 1) return; // todo unselect card
+        const nonallowedPiles = ['drawPile', 'flippedPile', 'topPile1', 'topPile2', 'topPile3', 'topPile4'];
+        if (!nonallowedPiles.includes(pile) && card?.value === 13) return;
+
+        handleCardDrop(pile);
+        // const card = game.selectedCard;
+
+        // if (!card) return;
+        // // @ts-ignore-next-line 
+        // const pileToRemoveFrom = game[card.location.pile];
+
+        // // @ts-ignore-next-line 
+        // pileToRemoveFrom.splice(card.location.index, 1);
+
+        // // @ts-ignore-next-line 
+        // game[pile].unshift(card);
+
+        // card.location = {
+        //     pile,
+        //     index: 0,
+        // }
+
+        // card.isSelected = false;
+
+        // setGame({
+        //     ...game
+        // });
     }
 
     useEffect(() => {
@@ -86,7 +160,8 @@ export const useGame = (): IGameContext => {
         game,
         flipDrawDeckCard,
         selectCard,
-        handleDropCardOnEmptyPile
+        handleDropCardOnEmptyPile,
+        handleCardClick,
     }
 
 };

@@ -10,7 +10,7 @@ interface ICardProps extends React.HTMLProps<HTMLDivElement> {
 }
 
 export const Card = ({ card, className, style }: ICardProps) => {
-    const { selectCard } = useGameContext();
+    const { selectCard, handleCardClick } = useGameContext();
     const suitIcon = () => {
         switch (card?.suit) {
             case 'hearts':
@@ -62,9 +62,10 @@ export const Card = ({ card, className, style }: ICardProps) => {
         <>
         {/* <div className={cs('w-24 h-32 border rounded', className)}> */}
         {!card?.isFaceUp ? (
-            <div style={style} className={cs(' bg-yellow-300 w-24 h-32 border border-black rounded min-w-min', className)}></div>
+            // @ts-ignore-next-line 
+            <div onClick={() => handleCardClick(card)} style={style} className={cs(' bg-yellow-300 w-24 h-32 border border-black rounded min-w-min', className)}></div>
             ) : (
-            <div style={style} onClick={() => selectCard(card)} className={cs(' bg-white min-w-min w-24 h-32 border rounded', className, {
+            <div style={style} onClick={() => handleCardClick(card)} className={cs(' bg-white min-w-min w-24 h-32 border rounded', className, {
                 'border-emerald-300': card.isSelected,
                 'border-black': !card.isSelected
             })}>
