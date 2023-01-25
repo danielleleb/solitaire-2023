@@ -13,12 +13,6 @@ export const useGame = (): IGameContext => {
         }
     }
 
-    const dropCardOnAnotherCard = (pile: string) => {
-
-    }
-
-
-
     const handleCardClick = (card: ICard) => {
         // @ts-ignore-next-line 
         if (!card.isFaceUp && !card.location.pile.includes('draw')) {
@@ -130,6 +124,9 @@ export const useGame = (): IGameContext => {
         }
         // unselect every other card 
         if (!card.isFaceUp) return;
+        // @ts-ignore-next-line 
+        // const pile = game[card.location.pile];
+        // const clickedCardIndex = pile?.indexOf(card);
         card.isSelected = true;
         setGame({
             ...game,
