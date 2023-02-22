@@ -13,6 +13,7 @@ export const useGame = (): IGameContext => {
     }
 
     const handleCardClick = (card: ICard) => {
+        // console.log(game.selectedCards, 'selected')
         // @ts-ignore-next-line 
         if (!card.isFaceUp && !card.location.pile.includes('draw')) {
             // @ts-ignore-next-line 
@@ -23,9 +24,13 @@ export const useGame = (): IGameContext => {
                 ...game,
             })
         } else if (game.selectedCards.length) {
-            console.log(game.selectedCards, 'selectedcards')
+            const selectedCards = game.selectedCards;
+            console.log(game.selectedCards, 'selectedcards??')
             // check if selectedcard can be dropped on this card
-            if (card.value === game.selectedCards[game.selectedCards.length - 1].value + 1) {
+            // @ts-ignore-next-line
+            console.log((card.location.pile.includes('top') && selectedCards.length === 1 && card.suit === selectedCards[0].suit && selectedCards[0].value === card.value + 1), 'can i drop it')
+            // @ts-ignore-next-line
+            if ((card.location.pile.includes('top') && selectedCards.length === 1 && card.suit === selectedCards[0].suit && selectedCards[0].value === card.value + 1) || card.value === game.selectedCards[game.selectedCards.length - 1].value + 1) {
                 // @ts-ignore-next-line 
                 handleCardDrop(`${card.location.pile}`);
             } else {
@@ -67,7 +72,6 @@ export const useGame = (): IGameContext => {
         // @ts-ignore-next-line 
         const pileToRemoveFrom = game[cards[0].location.pile];
 
-
         pileToRemoveFrom.splice(pileToRemoveFrom.indexOf(cards[0]), cards.length);
 
         // @ts-ignore-next-line 
@@ -87,9 +91,14 @@ export const useGame = (): IGameContext => {
     const handleDropCardOnEmptyPile = (pile: string) => {
         const cards = game.selectedCards;
 
+        // if (pile.includes('top') && (cards.length === 1 || cards[0]?.value === 1)) return; // todo unselect card
+
         if (pile.includes('top') && (cards.length !== 1 || cards[0]?.value !== 1)) return; // todo unselect card
+        
         const nonallowedPiles = ['drawPile', 'flippedPile', 'topPile1', 'topPile2', 'topPile3', 'topPile4'];
         if (!nonallowedPiles.includes(pile) && cards[cards.length - 1]?.value === 13) {
+            handleCardDrop(pile);
+        } else if (pile.includes('top') && cards.length === 1 && cards[0]?.value === 1) {
             handleCardDrop(pile);
         }
 

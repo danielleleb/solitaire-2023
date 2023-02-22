@@ -16,14 +16,9 @@ export const TopPile = ({ pileId}: ITopPile) => {
         <div className="m-1">
             {
                 pile.length ? (
-                    pile.map((card: ICard, index: number) => {
-                        return (
-                            <Card
-                                key={index}
-                                card={card}
-                            />
-                        )
-                    })
+                    <Card
+                        card={pile[0]}
+                    />
                 ) : (
                     <EmptyPile pileId={pileId} />
                 )
