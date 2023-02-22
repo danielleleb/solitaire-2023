@@ -23,7 +23,7 @@ export const startGame = (): IGame => {
         topPile2: [],
         topPile3: [],
         topPile4: [],
-        selectedCard: null,
+        selectedCards: [],
     };
 
     for (let i = 1; i <= 7; i++) {
@@ -32,7 +32,6 @@ export const startGame = (): IGame => {
             // @ts-ignore-next-line
             card.location = {
                 pile: `pile${i}`,
-                index: j - 1,
             }
             // @ts-ignore-next-line
             game[`pile${i}`].push(card);
@@ -44,7 +43,6 @@ export const startGame = (): IGame => {
     for (let i = 0; i < cards.length; i++) {
         cards[i].location = {
             pile: 'drawPile',
-            index: i,
         }
     }
 

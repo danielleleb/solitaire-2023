@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ICard, IGame, IGameContext } from "../types";
-import { generateFullDeck, startGame } from "../utils";
+import { startGame } from "../utils";
 
 export const useGame = (): IGameContext => {
-    console.log('use game called')
     const [game, setGame] = useState<IGame>(startGame);
 
     const flipCard = (card: ICard) => {
@@ -16,7 +15,6 @@ export const useGame = (): IGameContext => {
     const handleCardClick = (card: ICard) => {
         // @ts-ignore-next-line 
         if (!card.isFaceUp && !card.location.pile.includes('draw')) {
-            console.log('MADE IT IN')
             // @ts-ignore-next-line 
             const flippedCard = game[card.location.pile].shift();
             // @ts-ignore-next-line 
@@ -24,9 +22,10 @@ export const useGame = (): IGameContext => {
             setGame({
                 ...game,
             })
-        } else if (game.selectedCard) {
+        } else if (game.selectedCards.length) {
+            console.log(game.selectedCards, 'selectedcards')
             // check if selectedcard can be dropped on this card
-            if (card.value === game.selectedCard.value + 1) {
+            if (card.value === game.selectedCards[game.selectedCards.length - 1].value + 1) {
                 // @ts-ignore-next-line 
                 handleCardDrop(`${card.location.pile}`);
             } else {
@@ -40,41 +39,44 @@ export const useGame = (): IGameContext => {
     }
 
     const unselectCard = () => {
-        const card = game.selectedCard;
-        if (!card) return;
-        card.isSelected = false;
-        game.selectedCard = null;
+        const cards = game.selectedCards;
+        if (!cards.length) return;
+        updateCardsOnDrop(cards)
+        game.selectedCards = [];
         setGame({
             ...game,
         })
     }
 
+    const updateCardsOnDrop = (cards: ICard[], pile?: string) => {
+        cards.forEach((card) => {
+            card.isSelected = false;
+            if (pile) {
+                card.location = {
+                    pile,           
+                }
+            }
+        })
+    }
+
     const handleCardDrop = (pile: string) => {
-        const card = game.selectedCard;
-        console.log(card, 'card')
+        const cards = game.selectedCards;
 
-        if (!card) return;
-        // @ts-ignore-next-line 
-        const pileToRemoveFrom = game[card.location.pile];
-        console.log(pileToRemoveFrom, 'pileToRemoveFrom')
-
+        if (!cards.length) return;
 
         // @ts-ignore-next-line 
-        pileToRemoveFrom.splice(pileToRemoveFrom.indexOf(card), 1);
-        // pileToRemoveFrom.splice(card.location.index, 1);
+        const pileToRemoveFrom = game[cards[0].location.pile];
+
+
+        pileToRemoveFrom.splice(pileToRemoveFrom.indexOf(cards[0]), cards.length);
 
         // @ts-ignore-next-line 
-        game[pile].unshift(card);
+        game[pile].unshift(...cards);
 
-        card.location = {
-            pile,
-            index: 0,
-        }
-        
 
-        card.isSelected = false;
+        updateCardsOnDrop(cards, pile);
 
-        game.selectedCard = null;
+        game.selectedCards = [];
 
         setGame({
             ...game
@@ -83,67 +85,58 @@ export const useGame = (): IGameContext => {
 
 
     const handleDropCardOnEmptyPile = (pile: string) => {
-        const card = game.selectedCard;
-        if (pile.includes('top') && card?.value !== 1) return; // todo unselect card
+        const cards = game.selectedCards;
+
+        if (pile.includes('top') && (cards.length !== 1 || cards[0]?.value !== 1)) return; // todo unselect card
         const nonallowedPiles = ['drawPile', 'flippedPile', 'topPile1', 'topPile2', 'topPile3', 'topPile4'];
-        if (!nonallowedPiles.includes(pile) && card?.value === 13) return;
+        if (!nonallowedPiles.includes(pile) && cards[cards.length - 1]?.value === 13) {
+            handleCardDrop(pile);
+        }
 
-        handleCardDrop(pile);
-        // const card = game.selectedCard;
-
-        // if (!card) return;
-        // // @ts-ignore-next-line 
-        // const pileToRemoveFrom = game[card.location.pile];
-
-        // // @ts-ignore-next-line 
-        // pileToRemoveFrom.splice(card.location.index, 1);
-
-        // // @ts-ignore-next-line 
-        // game[pile].unshift(card);
-
-        // card.location = {
-        //     pile,
-        //     index: 0,
-        // }
-
-        // card.isSelected = false;
-
-        // setGame({
-        //     ...game
-        // });
+        // handleCardDrop(pile);
     }
 
-    useEffect(() => {
-        // find the prev selected card and unselect it 
-        console.log(game, 'game update')
-    }, [game])
+    const unselectCards = (cards: ICard[]) => {
+        cards.forEach(card => {
+            card.isSelected = false;
+        })
+    }
 
     const selectCard = (card: ICard) => {
-        if (game.selectedCard) {
-            game.selectedCard.isSelected = false;
+        if (game.selectedCards.length) {
+            unselectCards(game.selectedCards);
         }
         // unselect every other card 
         if (!card.isFaceUp) return;
         // @ts-ignore-next-line 
-        // const pile = game[card.location.pile];
-        // const clickedCardIndex = pile?.indexOf(card);
-        card.isSelected = true;
+        const pile = game[card.location.pile];
+        const clickedCardIndex = pile?.indexOf(card);
+
+        let cardsToSelect = [];
+        for (let i = 0; i <= clickedCardIndex; i++) {
+            // @ts-ignore-next-line
+            console.log(pile[i], 'pile')
+            // @ts-ignore-next-line
+            cardsToSelect.push(pile[i]);
+            pile[i].isSelected = true;
+        }
         setGame({
             ...game,
-            selectedCard: card,
+            selectedCards: [...cardsToSelect],
         })
     }
 
-    useEffect(() => {console.log(JSON.stringify(game.flippedPile), '5updatedgame')}, [game])
+    useEffect(() => {
+        // console.log(JSON.stringify(game), '5updatedgame')
+        // console.log(JSON.stringify(game, null, 2), '5updatedgame')
+    }, [game])
 
     const flipDrawDeckCard = () => {
-        // console.log(JSON.stringify(game.flippedPile), '1game outside setstate')
         const card = game.drawPile.pop();
-        // console.log(JSON.stringify(card), '3popped card')
+
         if (card) {
             card.location = {
                 pile: 'flippedPile',
-                index: 0,
             }
             game.flippedPile.unshift(flipCard(card));
         }

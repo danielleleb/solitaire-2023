@@ -25,6 +25,6 @@ export interface ICard {
     pile?: string;
     location?: {
         pile: string;
-        index: number;
+        // index: number;
     }
 }

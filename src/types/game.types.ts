@@ -18,7 +18,7 @@ export interface IGame {
     drawPile: ICard[];
     // flippedPile should be an array of all cards that have been flipped from drawPile
     flippedPile: ICard[];
-    selectedCard: ICard | null;
+    selectedCards: ICard[] | [];
 }
 
 export interface IGameContext {
